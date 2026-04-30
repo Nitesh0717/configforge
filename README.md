@@ -1,11 +1,11 @@
 # ConfigForge
 
-Config-driven dynamic admin dashboard built with Next.js and Node.js.
+A config-driven admin dashboard with dynamic UI rendering.
 
 ## 🚀 Features
-- Dynamic UI rendering (no hardcoding)
+- Dynamic UI (no hardcoding)
 - JWT Authentication
-- CRUD operations (Tasks)
+- CRUD operations (Task management)
 - Reusable components (Form + Table)
 
 ## 🛠 Tech Stack
@@ -27,4 +27,4 @@ npx ts-node-dev src/index.ts
 
 ## ⚡ Concept
 
-This project uses a config-first approach where UI is generated dynamically instead of being hardcoded, making it scalable and reusable.
+This project follows a config-first architecture where UI is generated dynamically instead of hardcoded, making it scalable and reusable.
