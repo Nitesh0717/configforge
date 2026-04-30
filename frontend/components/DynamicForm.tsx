@@ -86,7 +86,7 @@ export default function DynamicForm({ model, setRefresh }: any) {
         value={formData.title}
         onChange={handleChange}
         placeholder="Title"
-        className="p-2 bg-gray-800 border border-gray-600 rounded text-white"
+       
        className="p-2 bg-gray-800 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
 
