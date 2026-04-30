@@ -43,7 +43,7 @@ export default function DynamicForm({ model, setRefresh }: any) {
       const token = localStorage.getItem("token");
 
       if (!token) {
-        alert("Not authenticated");
+        console.log("Auth skipped (demo)");
         return;
       }
 

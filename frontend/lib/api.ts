@@ -1,5 +1,17 @@
 import axios from "axios";
 
-export const api = axios.create({
-  baseURL: "http://localhost:5000", // 👈 backend URL
-});
+// ⚠️ TEMP: No backend deployed → disable real API
+export const api = {
+  get: async () => {
+    return { data: [] };
+  },
+  post: async () => {
+    return { data: { success: true } };
+  },
+  put: async () => {
+    return { data: { success: true } };
+  },
+  delete: async () => {
+    return { data: { success: true } };
+  },
+};
