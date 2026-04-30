@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios";
 
-export default function DynamicForm({ model, setRefresh }: any) {
+export default function DynamicForm({ setRefresh }: any) {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -31,7 +30,6 @@ export default function DynamicForm({ model, setRefresh }: any) {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
-    // ✅ Validation
     if (!formData.title || !formData.description) {
       alert("Please fill all fields");
       return;
@@ -40,22 +38,21 @@ export default function DynamicForm({ model, setRefresh }: any) {
     try {
       setLoading(true);
 
-      const token = localStorage.getItem("token");
+      // ✅ LOCAL STORAGE SAVE (NO BACKEND)
+      const newTask = {
+        id: Date.now(),
+        title: formData.title,
+        description: formData.description,
+        completed: formData.completed,
+      };
 
-      if (!token) {
-        console.log("Auth skipped (demo)");
-        return;
-      }
-
-      await axios.post(
-        `http://localhost:5000/api/${model}`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const existingTasks = JSON.parse(
+        localStorage.getItem("tasks") || "[]"
       );
+
+      const updatedTasks = [...existingTasks, newTask];
+
+      localStorage.setItem("tasks", JSON.stringify(updatedTasks));
 
       // ✅ Reset form
       setFormData({
@@ -64,10 +61,10 @@ export default function DynamicForm({ model, setRefresh }: any) {
         completed: false,
       });
 
-      // ✅ Refresh table
+      // ✅ Refresh UI
       setRefresh((prev: number) => prev + 1);
-    } catch (err: any) {
-      console.error("Create error:", err?.response?.data || err.message);
+    } catch (err) {
+      console.error(err);
       alert("Failed to create task");
     } finally {
       setLoading(false);
@@ -86,8 +83,7 @@ export default function DynamicForm({ model, setRefresh }: any) {
         value={formData.title}
         onChange={handleChange}
         placeholder="Title"
-       
-       className="p-2 bg-gray-800 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="p-2 bg-gray-800 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
 
       {/* Description */}

@@ -1,90 +1,46 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
 
 export default function DynamicTable({ model, refresh }: any) {
   const [data, setData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-
-      const token = localStorage.getItem("token");
-
-      if (!token) {
-        console.log("Auth skipped (demo)");
-        return;
-      }
-
-      const res = await axios.get(
-        `http://localhost:5000/api/${model}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      setData(res.data);
-    } catch (err: any) {
-      console.error("Fetch error:", err?.response?.data || err.message);
-      alert("Error fetching data");
-    } finally {
-      setLoading(false);
-    }
+  // ✅ Fetch from localStorage
+  const fetchData = () => {
+    const tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+    setData(tasks);
   };
 
-  const handleDelete = async (id: number) => {
-    try {
-      const token = localStorage.getItem("token");
+  // ✅ Delete
+  const handleDelete = (id: number) => {
+    const tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+    const updated = tasks.filter((item: any) => item.id !== id);
 
-      await axios.delete(
-        `http://localhost:5000/api/${model}/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      fetchData();
-    } catch (err) {
-      alert("Delete failed");
-    }
+    localStorage.setItem("tasks", JSON.stringify(updated));
+    fetchData();
   };
 
-  const handleEdit = async (item: any) => {
-    const newTitle = prompt("Enter new title", item.data.title);
-    const newDescription = prompt(
-      "Enter new description",
-      item.data.description
-    );
+  // ✅ Edit
+  const handleEdit = (item: any) => {
+    const newTitle = prompt("Enter new title", item.title);
+    const newDescription = prompt("Enter new description", item.description);
 
     if (!newTitle || !newDescription) return;
 
-    try {
-      const token = localStorage.getItem("token");
+    const tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
 
-      await axios.put(
-        `http://localhost:5000/api/${model}/${item.id}`,
-        {
-          title: newTitle,
-          description: newDescription,
-          completed: item.data.completed,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+    const updated = tasks.map((t: any) =>
+      t.id === item.id
+        ? {
+            ...t,
+            title: newTitle,
+            description: newDescription,
+          }
+        : t
+    );
 
-      fetchData();
-    } catch (err) {
-      alert("Update failed");
-    }
+    localStorage.setItem("tasks", JSON.stringify(updated));
+    fetchData();
   };
 
   useEffect(() => {
@@ -97,9 +53,7 @@ export default function DynamicTable({ model, refresh }: any) {
         {model} Table
       </h2>
 
-      {loading ? (
-        <p>Loading...</p>
-      ) : data.length === 0 ? (
+      {data.length === 0 ? (
         <div className="text-center py-8 text-gray-400">
           <p className="text-lg">🚫 No tasks yet</p>
           <p className="text-sm mt-1">
@@ -110,42 +64,42 @@ export default function DynamicTable({ model, refresh }: any) {
         <div className="grid gap-3">
           {data.map((item) => (
             <div
-  key={item.id}
-  className="bg-gradient-to-r from-gray-800 to-gray-900 p-5 rounded-xl border border-gray-700 hover:border-blue-500 hover:shadow-lg transition-all duration-300"
->
-             <h3 className="text-lg font-semibold text-white mb-1">
-  {item.data.title}
-</h3>
+              key={item.id}
+              className="bg-gradient-to-r from-gray-800 to-gray-900 p-5 rounded-xl border border-gray-700 hover:border-blue-500 hover:shadow-lg transition-all duration-300"
+            >
+              <h3 className="text-lg font-semibold text-white mb-1">
+                {item.title}
+              </h3>
 
-<p className="text-gray-400 text-sm mb-2">
-  {item.data.description}
-</p>
+              <p className="text-gray-400 text-sm mb-2">
+                {item.description}
+              </p>
 
-<span
-  className={`text-xs px-2 py-1 rounded ${
-    item.data.completed
-      ? "bg-green-600 text-white"
-      : "bg-red-600 text-white"
-  }`}
->
-  {item.data.completed ? "Done" : "Pending"}
-</span>
+              <span
+                className={`text-xs px-2 py-1 rounded ${
+                  item.completed
+                    ? "bg-green-600 text-white"
+                    : "bg-red-600 text-white"
+                }`}
+              >
+                {item.completed ? "Done" : "Pending"}
+              </span>
 
               <div className="mt-4 flex gap-2">
-  <button
-    onClick={() => handleEdit(item)}
-    className="bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded text-sm font-medium"
-  >
-    ✏️ Edit
-  </button>
+                <button
+                  onClick={() => handleEdit(item)}
+                  className="bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded text-sm font-medium"
+                >
+                  ✏️ Edit
+                </button>
 
-  <button
-    onClick={() => handleDelete(item.id)}
-    className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm font-medium"
-  >
-    🗑 Delete
-  </button>
-</div>
+                <button
+                  onClick={() => handleDelete(item.id)}
+                  className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm font-medium"
+                >
+                  🗑 Delete
+                </button>
+              </div>
             </div>
           ))}
         </div>
